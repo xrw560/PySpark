@@ -1,13 +1,6 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
-"""
-@author: xuanyu
-@contact: xuanyu@126.com
-@file:.py
-@time:2017/5/16 21:54
-"""
-
 # 导入模块 pyspark
 from pyspark import SparkConf, SparkContext
 # 导入系统模块
