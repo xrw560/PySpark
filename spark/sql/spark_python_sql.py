@@ -53,6 +53,7 @@ if __name__ == '__main__':
         # split line
         arr = line.split("\t")
         # return
+        # 函数的参数可以指定名称，schema已定义
         return Row(track_time=arr[0], url=arr[1], session_id=arr[2], referer=arr[3],
                    ip=arr[4], end_user_id=arr[5], city_id=arr[6])
 
