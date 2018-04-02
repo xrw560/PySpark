@@ -2,10 +2,10 @@
 # -*- encoding:utf-8 -*-
 
 """
-@author: xuanyu
-@contact: xuanyu@126.com
-@file: track_log_analyzer.py
-@time: 2017/5/16 21:54
+一号店某天两个小时用户访问网站行为数据
+    18 、19
+需求：
+    统计每日的PV和UV
 """
 
 # 导入模块 pyspark
@@ -20,8 +20,8 @@ if __name__ == '__main__':
     os.environ['HADOOP_HOME'] = 'G:/OnlinePySparkCourse/pyspark-project/winuntil'
 
     # Create SparkConf
-    sparkConf = SparkConf()\
-        .setAppName('Python Spark WordCount')\
+    sparkConf = SparkConf() \
+        .setAppName('Python Spark WordCount') \
         .setMaster('local[2]')
 
     # Create SparkContext
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         Step 1：
             read data : SparkContext从HDFS读取数据
     """
-    # file　hdfs directory
+    # file hdfs directory
     track_log = "/user/hive/warehouse/db_track.db/yhd_log/date=20150828"
     # read data
     track_rdd = sc.textFile(track_log)
@@ -55,6 +55,8 @@ if __name__ == '__main__':
                     用户访问时间的字段获取
                         tracktime     2015-08-28 18:10:00         第18列
     """
+
+
     # 字符串的映射函数
     def split_data_func(line):
         # 字符串分割
@@ -64,10 +66,11 @@ if __name__ == '__main__':
         # return (date, url, guid)
         return date_str, words[1], words[5]
 
+
     # 对原始数据进行清洗过滤及转换
-    filtered_rdd = track_rdd\
-        .filter(lambda line: (len(line.strip()) > 0) and (len(line.split("\t")) > 20))\
-        .map(split_data_func)
+    filtered_rdd = track_rdd \
+        .filter(lambda line: (len(line.strip()) > 0) and (len(line.split("\t")) > 20)) \
+        .map(split_data_func)  # (date, url, guid)
 
     # # test
     # print str(filtered_rdd.first())
@@ -79,10 +82,10 @@ if __name__ == '__main__':
     """
         统计每日PV
     """
-    pv_rdd = filtered_rdd\
-        .map(lambda (date, url, guid): (date, url))\
-        .filter(lambda (date, url): len(url.strip()) > 0)\
-        .map(lambda t: (t[0], 1))\
+    pv_rdd = filtered_rdd \
+        .map(lambda (date, url, guid): (date, url)) \
+        .filter(lambda (date, url): len(url.strip()) > 0) \
+        .map(lambda t: (t[0], 1)) \
         .reduceByKey(lambda x, y: x + y)
     # print
     pv_first = pv_rdd.first()
@@ -96,10 +99,10 @@ if __name__ == '__main__':
         每日统计UV
     """
     uv_rdd = (filtered_rdd
-                .map(lambda (date, url, guid): (date, guid))
-                .distinct()
-                .map(lambda t: (t[0], 1))
-                .reduceByKey(lambda x, y: x + y))
+              .map(lambda (date, url, guid): (date, guid))
+              .distinct()
+              .map(lambda t: (t[0], 1))
+              .reduceByKey(lambda x, y: x + y))
     # print
     uv_first = uv_rdd.first()
     print "UV: " + str(uv_first[0]) + " = " + str(uv_first[1])
