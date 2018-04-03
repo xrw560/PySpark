@@ -1,11 +1,6 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
-"""
-@author: xuanyu
-@contact: xuanyu@126.com
-"""
-
 # 导入模块 pyspark
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, Row
@@ -38,7 +33,7 @@ if __name__ == '__main__':
     # definition function
     def squared_func(number):
         return number * number
-    # register function
+    # register function,使用默认返回类型StringType
     sqlContext.udf.register('func_squared', squared_func)
 
     # 指定返回类型
@@ -65,9 +60,10 @@ if __name__ == '__main__':
     """
     # 读取表中的数据
     test_df = sqlContext.table("tmp_test")
+    #
     from pyspark.sql.functions import udf
     squared_udf = udf(squared_func, LongType())
-    #
+    # 应用udf
     result_df = test_df.select('id', squared_udf('id').alias('id_squared'))
     #
     result_df.show()
