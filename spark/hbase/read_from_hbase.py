@@ -49,7 +49,8 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sc)
 
     host = 'slave1,slave2,slave3'
-    table = 'z_spark_50w'
+    table = 'z_spark_1w'
+    # table = 'z_spark_500w_one'
     # table = 'z_spark_500w'
     # table = 'z_spark_1000w'
     # table = 'z_spark_5000w'
@@ -68,23 +69,23 @@ if __name__ == '__main__':
 
     hbase_rdd = sc.newAPIHadoopRDD(inputFormatClass, keyClass, valueClass, keyConverter=keyConv,
                                    valueConverter=valueConv, conf=conf)
-    values__take = hbase_rdd.values().take(1)
-    for x in values__take:
-        print(x)
+    # values__take = hbase_rdd.values().saveAsTextFile('hdfs://master:9000/work/data/output04')
+    # print(values__take)
+    # for x in values__take:
+    #     print(x)
     end = datetime.datetime.now()
     print('-----newAPIHadoopRDD------- time :', end - start)
 
-    # values = hbase_rdd.values()
+    values = hbase_rdd.values()
     # n_map = values.flatMap(lambda x: x.split("\n")).map(lambda x: json.loads(x))
+    n_map = values.flatMap(lambda x: x.split("\n")).foreach(lambda x: print(x))
     # data_frame = sqlContext.read.json(n_map)
     # data_frame.show()
     # data_frame.printSchema()
 
-    values = hbase_rdd.values()
-    n_map = values.flatMap(lambda x: x.split("\n")).map(lambda x: json.loads(x)).map(lambda x: dict_del(x))
-    data_frame = sqlContext.read.json(n_map)
-
-
+    # values = hbase_rdd.values()
+    # n_map = values.flatMap(lambda x: x.split("\n")).map(lambda x: json.loads(x)).map(lambda x: dict_del(x))
+    # data_frame = sqlContext.read.json(n_map)
 
     # data_frame.show()
     # data_frame.printSchema()
@@ -106,16 +107,16 @@ if __name__ == '__main__':
     # df_avg1.withColumnRenamed('qualifier', 'column').withColumnRenamed('avg(value)', 'value') \
     #     .write.jdbc(url, mysql_table, 'append', mysql_properties)
 
-    result = data_frame.groupBy('qualifier') \
-        .agg(F.min(data_frame.value),
-             F.max(data_frame.value),
-             F.avg(data_frame.value),
-             F.sum(data_frame.value),
-             F.count(data_frame.value))
-    end = datetime.datetime.now()
-    print('------------ time :', end - start)
-    print('-------mysql-----------')
-    result.write.jdbc(url, mysql_table, 'append', mysql_properties)
+    # result = data_frame.groupBy('qualifier') \
+    #     .agg(F.min(data_frame.value),
+    #          F.max(data_frame.value),
+    #          F.avg(data_frame.value),
+    #          F.sum(data_frame.value),
+    #          F.count(data_frame.value))
+    # end = datetime.datetime.now()
+    # print('------------ time :', end - start)
+    # print('-------mysql-----------')
+    # result.write.jdbc(url, mysql_table, 'append', mysql_properties)
 
     # n_map = hbase_rdd.flatMap(lambda x: split_key_value(x[0], x[1])).map(lambda x: (x[0], json.loads(x[1]))).count()
     # print(n_map)

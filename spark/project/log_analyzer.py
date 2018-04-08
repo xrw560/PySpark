@@ -1,11 +1,6 @@
 #!/usr/bin/python
 # -*- encoding:utf-8 -*-
 
-"""
-@author: xuanyu
-@contact: xuanyu@126.com
-"""
-
 # 导入模块 pyspark
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, Row
@@ -20,8 +15,8 @@ if __name__ == '__main__':
     os.environ['HADOOP_HOME'] = 'G:/OnlinePySparkCourse/pyspark-project/winuntil'
 
     # Create SparkConf
-    sparkConf = SparkConf()\
-        .setAppName('Python Log Analyzer')\
+    sparkConf = SparkConf() \
+        .setAppName('Python Log Analyzer') \
         .setMaster('local[2]')
 
     # Create SparkContext
@@ -42,7 +37,7 @@ if __name__ == '__main__':
     """
     # 日志文件路径
     log_file_path = "/datas/access_log_Jul95"
-    # 读取HDFS上文件，此处不适用sc.textFile()此方法，直接使用SparkSQL中方法进行读取数据
+    # 读取HDFS上文件，此处不使用sc.textFile()此方法，直接使用SparkSQL中方法进行读取数据
     # sqlContext.read.text()方式，读取数据以后仅有一个字段, 名称为：value，类型为String
     base_df = sqlContext.read.text(log_file_path)
 
@@ -57,12 +52,13 @@ if __name__ == '__main__':
             将数据进行解析，解析到七个字段中
                 - 正则表达式
                 - SparkSQL的函数regexp_extract()
-                此函数可以使用包含一个或者多个捕获组的正则表打是匹配的内容，然后提取其中一个捕获组来匹配
+                此函数可以使用包含一个或者多个捕获组的正则表达式匹配的内容，然后提取其中一个捕获组来匹配
             解析获取的字段：
                 host        timestamp       path        status      content_size
     """
     # 导入相应的函数
     from pyspark.sql.functions import regexp_extract
+
     # 正则表达式中常用的字符意思
     #   s->任意空白字符  S->任意非空白字符  d->一个数字  D->非数字  w->数字\字母\下划线中任意一个字符
     #   ^->匹配开始位置  $->匹配结束位置
@@ -105,16 +101,31 @@ if __name__ == '__main__':
     # 统计每列有多少个null值
     from pyspark.sql.functions import col, sum
 
+
     # 定义函数，统计某个字段为null出现的个数
     def count_null(column_name):
+        """
+        - 判断DataFrame中某一列是否为null
+            col(column_name).isNull()
+            col(column_name)表示的是将字符串转换为列Column对象
+        - 将布尔类型值转换为转型
+            .cast('integer')
+            说明：
+                - 布尔值为true：1
+                - 布尔值为false：0
+        - 给聚合后的值，起一个别名
+        列的名称
+        """
         return sum(col(column_name).isNull().cast('integer')).alias(column_name)
+
+
     # 定义列表list
     exprs = []
     for col_name in split_df.columns:
         exprs.append(count_null(col_name))
 
     # # df.agg(F.min(df.age))
-    # split_df.agg(*exprs).show()
+    # split_df.agg(*exprs).show() # *exprs表示多个参数
     # # +----+---------+----+------+------------+
     # # |host|timestamp|path|status|content_size|
     # # +----+---------+----+------+------------+
@@ -123,7 +134,7 @@ if __name__ == '__main__':
 
     """
         针对为null的字段的值进行过滤
-            - 对status这列值进行过滤为null的数据
+            - 对status这列的值进行过滤为null的数据
             - 对content_size这列数据为null进行过滤
     """
     cleaned_df_first = split_df.filter(split_df['status'].isNotNull())
@@ -135,7 +146,7 @@ if __name__ == '__main__':
     # # +----+---------+----+------+------------+
 
     # # 针对最后一列进行过滤，首先统计有多少条数据是不以一个或者多个数字结尾
-    # bad_content_size_df = base_df.filter(~ base_df['value'].rlike(r'\d+$'))
+    # bad_content_size_df = base_df.filter(~ base_df['value'].rlike(r'\d+$')) # rlike正则
     # print "不以一个或者多个数字结尾的行：" + str(bad_content_size_df.count())
     # # 不以一个或者多个数字结尾的行：19727
 
@@ -143,8 +154,8 @@ if __name__ == '__main__':
     # from pyspark.sql.functions import concat, lit
     # bad_content_size_df.select(concat(bad_content_size_df['value']), lit('*')).show(truncate=False)
 
-    # 从上述的显示结果来看，表明数据response客户端的时候，服务器谢了一个dash字符，需要将这些字符替换为0
-    # na 返回的是一个DataFrameNaFunctions Object，这个对象中包含了很多可以粗略null列的方法
+    # 从上述的显示结果来看，表明数据response响应客户端的时候，服务器写了一个dash字符，需要将这些字符替换为0
+    # na 返回的是一个DataFrameNaFunctions Object，这个对象中包含了很多可以处理null列的方法
     cleaned_df = cleaned_df_first.na.fill({'content_size': 0})
     # cleaned_df.agg(*exprs).show()
     # print "清洗数据Count：" + str(cleaned_df.count())
@@ -165,6 +176,7 @@ if __name__ == '__main__':
         'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
     }
 
+
     # 定义函数 01/Aug/1995:00:00:07 -0400
     def parse_clf_time(s):
         return "{0:04d}-{1:02d}-{2:02d} {3:02d}:{4:02d}:{5:02d}".format(
@@ -175,8 +187,11 @@ if __name__ == '__main__':
             int(s[15:17]),
             int(s[18:20]),
         )
+
+
     # 使用UDF函数，转换日期数据
     from pyspark.sql.functions import udf
+
     u_parse_time = udf(parse_clf_time)
 
     # 进行数据格式转换，采用DataFrame（DSL）
@@ -237,7 +252,7 @@ if __name__ == '__main__':
     # # 获取有多少个HTTP RESPONSE CODE
     # status_to_count_length = status_to_count_df.count()
     # # 打印信息
-    # print 'Fount %d response code' % status_to_count_length
+    # print 'Found %d response code' % status_to_count_length
     # # 展示结果
     # status_to_count_df.show()
     #
@@ -248,7 +263,7 @@ if __name__ == '__main__':
         统计一下访问服务器次数超过10次host
     """
     # # -1, 分组\统计
-    # host_sum_df = logs_df.groupBy('host').count().sort('count', ascending=False)
+    # host_sum_df = logs_df.groupBy('host').count().sort('count', ascending=False) # 降序
     # # -2, 过滤\筛选字段
     # host_more_than_10_df = host_sum_df\
     #     .filter(host_sum_df['count'] > 10)\
@@ -364,7 +379,8 @@ if __name__ == '__main__':
     # -1, 日志中有多少HTTP的响应是404, 使用filter函数进行过滤即可
     not_found_df = logs_df.filter('status=404')
     not_found_df.cache()
-    print 'Found {0} 404 URLs '.format(not_found_df.count())
+    print
+    'Found {0} 404 URLs '.format(not_found_df.count())
 
     # -2, 看看哪些URIs 返回的HTTP 404，考虑去重
     not_found_paths_df = not_found_df.select('path')
@@ -372,7 +388,7 @@ if __name__ == '__main__':
     # 去重
     unique_not_found_paths_df = not_found_paths_df.distinct()
     # 打印信息
-    print '404 URIs: \n'
+    print('404 URIs: \n')
     unique_not_found_paths_df.show(n=40, truncate=False)
 
     # -3, 统计返回HTTP 404状态中最多的前20个URIs，按照path进行分组，记性count统计，将序排序
@@ -384,7 +400,8 @@ if __name__ == '__main__':
                            )
     not_found_paths_df.unpersist()
     # 打印
-    print 'Top Twenty 404 URIs: \n'
+    print
+    'Top Twenty 404 URIs: \n'
     top_20_not_found_df.show(n=20, truncate=False)
 
     # -4, 统计收到HTTP 404状态的最多的25 hosts
@@ -396,27 +413,32 @@ if __name__ == '__main__':
                           .sort('count', ascending=False)
                           )
     # 显示
-    print 'Top 25 hosts that generated errors: \n'
+    print
+    'Top 25 hosts that generated errors: \n'
     hosts_404_count_df.show(n=25, truncate=False)
 
     # -5, 统计每天出现的HTTP 404 的次数
     from pyspark.sql.functions import dayofmonth
+
     errors_by_date_df = (not_found_df
                          .select(dayofmonth(logs_df.time).alias('day'))
                          .groupBy('day')
                          .count()
                          )
     #
-    print '404 Error by day: \n'
+    print
+    '404 Error by day: \n'
     errors_by_date_df.show(n=30, truncate=False)
 
     # -6, 统计哪5天出现HTTP 404次数最多
     top_error_date_df = errors_by_date_df.sort('count', ascending=False)
-    print 'Top Five Dates For 404 Requests: \n'
+    print
+    'Top Five Dates For 404 Requests: \n'
     top_error_date_df.show(n=5, truncate=False)
 
     # -7, 既然能够按照每天HTTP 404出现次数计算统计，也可以按照小时进行统计分析
     from pyspark.sql.functions import hour
+
     hour_records_sorted_df = (not_found_df
                               .select(hour('time').alias('hour'))
                               .groupBy('hour')
@@ -424,7 +446,8 @@ if __name__ == '__main__':
                               .sort('count', ascending=False)
                               )
     #
-    print 'Top hours for 404 Requests:\n'
+    print
+    'Top hours for 404 Requests:\n'
     hour_records_sorted_df.show(n=24, truncate=False)
 
     not_found_df.unpersist()
