@@ -13,7 +13,9 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sparkContext=sc)
     df = sqlContext.read \
         .format("org.apache.phoenix.spark") \
-        .option("table", "z_spark_500w_one") \
-        .option("zkUrl", "192.168.0.191:2181") \
+        .option("table", "\"test\"") \
+        .option("zkUrl", "ubuntu:2181") \
         .load()
+    df.show()
+    sc.stop()
 
