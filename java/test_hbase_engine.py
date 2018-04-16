@@ -12,29 +12,43 @@ import json
 
 if __name__ == '__main__':
     start = datetime.datetime.now()
+    print("开始时间：", start)
     sc = SparkContext(appName="test_hbase_engine")
     try:
         sqlContext = SQLContext(sparkContext=sc)
         java_import(sc._jvm, "pie.data.hbase.DyJa")
         dy_ja = sc._jvm.DyJa()
-        result = dy_ja.getDataHb("z_spark_500w_one", 'info', 'data01')
-        # result = dy_ja.getDataHb("z_spark_1w", 'info', 'data01')
-        print('----> len: ', len(result))
-        print(sc.parallelize(result).count())
-        # result_json = json.loads(" ".join(result))
-        # df = sqlContext.read.json(result_json)
-        # print('---------> df.count() : ', df.count())
+        result = dy_ja.getAllDataHb("z_spark_50w_three")
 
-        # end = datetime.datetime.now()
-        # print('-----getData------- time :', end - start)
-        # sc.parallelize(result).saveAsTextFile('hdfs://master:9000/work/data/output06')
+        # print(int(int(result.size()) / 4))
+
+        first_rdd = sc.parallelize(result)
+        # print(int(first_rdd.count() / 4))
+        base_rdd = first_rdd.map(lambda x: x.split(":")).map(lambda x: (x[0], float(x[1])))
+        result_mysql = base_rdd.combineByKey(
+            lambda x: (x, 1),
+            lambda x, y: (x[0] + y, x[1] + 1),
+            lambda x, y: (x[0] + y[0], x[1] + y[1])
+        ).map(lambda x: (x[0], float(x[1][0]) / float(x[1][1]))).collect()
+        # for x in result_mysql:
+        #     print(x)
+        # ---------------------------- pyspark -------------------------------------
+        import pymysql
+
+        conn = pymysql.connect(host='192.168.0.179', port=3306, user='root', passwd='root', db='zn')
+        cursor = conn.cursor()
+        insert_sql = "INSERT INTO hbase_test04(qualifier,value) VALUES(%s,%s)"
+        cursor.executemany(insert_sql, result_mysql)
+        # 提交
+        conn.commit()
+        # 关闭游标和连接
+        cursor.close()
+        conn.close()
 
         end = datetime.datetime.now()
-        print('-----application run time :', end - start)
+        print("当前时间：", end)
+        print('总运行时间', end - start)
         sc.stop()
     except Exception as e:
         print(e)
-        end = datetime.datetime.now()
-        print('-----application run time :', end - start)
         sc.stop()
-    print("-------------finished-----------------------")

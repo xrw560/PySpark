@@ -34,12 +34,12 @@ def dict_del(rdict):
 
 if __name__ == '__main__':
     start = datetime.datetime.now()
-    print('开始时间:', start)
+    print('-----------start:', start)
 
     # =======================MySQL配置===============================
-    # url = "jdbc:mysql://192.168.0.179:3306/zn"
-    # mysql_table = "hbase_test02"
-    # mysql_properties = {"user": "root", "password": "root"}
+    url = "jdbc:mysql://192.168.0.179:3306/zn"
+    mysql_table = "hbase_test02"
+    mysql_properties = {"user": "root", "password": "root"}
     # ===============================================================
 
     sparkConf = SparkConf() \
@@ -49,7 +49,12 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sc)
 
     host = 'slave1,slave2,slave3'
+    # table = 'z_spark_1w'
+    # table = 'z_spark_500w_one'
     table = 'z_spark_test'
+    # table = 'z_spark_500w'
+    # table = 'z_spark_1000w'
+    # table = 'z_spark_5000w'
     inputFormatClass = 'org.apache.hadoop.hbase.mapreduce.TableInputFormat'
     keyClass = 'org.apache.hadoop.hbase.io.ImmutableBytesWritable'
     valueClass = 'org.apache.hadoop.hbase.client.Result'
@@ -65,42 +70,24 @@ if __name__ == '__main__':
 
     hbase_rdd = sc.newAPIHadoopRDD(inputFormatClass, keyClass, valueClass, keyConverter=keyConv,
                                    valueConverter=valueConv, conf=conf)
-    # hbase_rdd.values().saveAsTextFile('hdfs://master:9000/work/data/output03')
-
-    # print(hbase_rdd.count())
+    # values__take = hbase_rdd.values().saveAsTextFile('hdfs://master:9000/work/data/output01')
+    # print(values__take)
+    # for x in values__take:
+    #     print(x)
+    end = datetime.datetime.now()
+    print('----------------time:', end)
+    print('-----newAPIHadoopRDD------- time :', end - start)
 
     values = hbase_rdd.values()
-    base_rdd = values.flatMap(lambda x: x.split("\n")).map(lambda x: (x[16:22], float(x[134:138])))
+    n_map = values.flatMap(lambda x: x.split("\n")) \
+        .map(lambda x: json.loads(x)) \
+        .map(lambda x: (x['row'], x['qualifier'], float(x['value']))).cache()
+    n_map.map(lambda x:(x(0)))
+    # n_map = values.flatMap(lambda x: x.split("\n")).foreach(lambda x: print(x))
+    # data_frame = sqlContext.read.json(n_map)
+    # data_frame.show()
+    # data_frame.printSchema()
 
-    result_mysql = base_rdd.combineByKey(
-        lambda x: (x, 1),
-        lambda x, y: (x[0] + y, x[1] + 1),
-        lambda x, y: (x[0] + y[0], x[1] + y[1])
-    ).map(lambda x: (x[0], float(x[1][0]) / float(x[1][1]))).collect()
-
-    # for x in result_mysql:
-    #     print(x)
-
-    # # ---------------------------- pyspark -------------------------------------
-    import pymysql
-
-    conn = pymysql.connect(host='192.168.0.179', port=3306, user='root', passwd='root', db='zn')
-    cursor = conn.cursor()
-    insert_sql = "INSERT INTO hbase_test04(qualifier,value) VALUES(%s,%s)"
-    cursor.executemany(insert_sql, result_mysql)
-    # 提交
-    conn.commit()
-    # 关闭游标和连接
-    cursor.close()
-    conn.close()
-
-    sc.stop()
-
-    end = datetime.datetime.now()
-    print('当前时间:', end)
-    print('总运行时间:', end - start)
-
-    # ---------------DataFrame形式加载数据---------------------------
     # values = hbase_rdd.values()
     # n_map = values.flatMap(lambda x: x.split("\n")).map(lambda x: json.loads(x)).map(lambda x: dict_del(x))
     # data_frame = sqlContext.read.json(n_map)
@@ -117,19 +104,24 @@ if __name__ == '__main__':
     #            F.count(data_frame.value)).collect())
     # df_avg1 = data_frame.groupBy('qualifier').avg("value")
 
+    # lookup = sqlContext.createDataFrame([(1, "foo"), (2, "bar")], ("k", "v"))
+    # lookup.show()
+    # lookup.printSchema()
+
     # 写入到mysql中
     # df_avg1.withColumnRenamed('qualifier', 'column').withColumnRenamed('avg(value)', 'value') \
     #     .write.jdbc(url, mysql_table, 'append', mysql_properties)
 
-    # result = data_frame.groupBy('qualifier') \
-    #     .agg(F.min(data_frame.value),
-    #          F.max(data_frame.value),
-    #          F.avg(data_frame.value),
-    #          F.sum(data_frame.value),
-    #          F.count(data_frame.value))
-    # end = datetime.datetime.now()
-    # print('-----------time:', end)
-    # print('------------compute  time ---- :', end - start)
+    # 保存到mysql方式一：转换为rdd
+    # result_mysql = result.rdd.map(lambda output: (
+    #     output.qualifier, output['min(value)'], output['max(value)'], str(output['avg(value)']),
+    #     str(output['sum(value)']),
+    #     str(output['count(value)']))).collect()
+
+    end = datetime.datetime.now()
+    print('-----------time:', end)
+    print('------------compute  time ---- :', end - start)
+    # 保存到mysql方式二：使用dataframe接口保存
     # result.write.jdbc(url, mysql_table, 'append', mysql_properties)
 
     # n_map = hbase_rdd.flatMap(lambda x: split_key_value(x[0], x[1])).map(lambda x: (x[0], json.loads(x[1]))).count()
@@ -143,7 +135,16 @@ if __name__ == '__main__':
     # data_frame.show()
     # data_frame.printSchema()
 
+    # data_frame = sqlContext.read.json(n_map[1])
+    # data_frame.show()
+    # data_frame.printSchema()
 
+    # values.foreach(lambda x: print(json.loads(x), type(json.loads(x))))
+    # values.map(lambda x: json.dumps(x)).map(lambda x: json.loads(x)).foreach(lambda x: print(type(x)))
+    # json_data = values.map(lambda x: json.dumps(x)).collect()
+    # read_json = sqlContext.read.json(json_data)
+    # read_json.show()
+    # read_json.printSchema()
 
     # print(type(json_loads))
     # json_str = json.loads(values)
@@ -170,3 +171,30 @@ if __name__ == '__main__':
     #
     # for (k, v) in output:
     #     print(k, v)
+
+    # ---------------------------- pyspark -------------------------------------
+    # import pymysql
+    #
+    # #
+    # conn = pymysql.connect(host='192.168.0.179', port=3306, user='root', passwd='root', db='zn')
+    # cursor = conn.cursor()
+    # insert_sql = "INSERT INTO hbase_test03(qualifier,n_value,max_value,avg_value,sum_value,count_value) VALUES(%s,%s,%s,%s,%s,%s)"
+    # cursor.executemany(insert_sql, result_mysql)
+    # # print(result_mysql)
+    # # for (top_word, top_count) in top_rdd:
+    # #     values.append((str(top_word), str(top_count)))
+    # #
+    # # cursor.executemany(insert_sql, values)
+    # #
+    # # 提交
+    # conn.commit()
+    #
+    # # 关闭游标和连接
+    # cursor.close()
+    # conn.close()
+
+    sc.stop()
+
+    end = datetime.datetime.now()
+    print('-------------------time:', end)
+    print('------------finish time :', end - start)

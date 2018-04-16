@@ -68,10 +68,9 @@ if __name__ == '__main__':
     rdd = sc.textFile("/datas/wc.input")
 
     # 测试, 获取总数count及第一条数据
-    print
-    rdd.count()
-    print
-    rdd.first()
+    print(rdd.count())
+
+    print(rdd.first())
 
     # ===============================================================
     # 词频统计，针对SCALA编程 flatMap\map\reduceByKey
@@ -81,8 +80,7 @@ if __name__ == '__main__':
         .reduceByKey(lambda a, b: a + b)
     # output
     for x in word_count_rdd.collect():
-        print
-        x[0] + ", " + str(x[1])
+        print(x[0] + ", " + str(x[1]))
 
     # Save Result To HDFS
     # word_count_rdd.saveAsTextFile("/datas/pyspark-wc-output")

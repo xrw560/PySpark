@@ -37,3 +37,36 @@ class Test(object):
         testRdd = self.sc.parallelize(row)
         values = testRdd.values()
         print(values.count())
+
+        col = bytes(self.columns.encode("utf-8"))
+        serilizeRdd = values.map(lambda value: float(value.get(col).decode()))
+
+        #
+        # def hash_domain(url):
+        #     return hash(urlparse.urlparse(url).netloc)
+
+        mlibRDD = self.sc.parallelize((([Vectors.dense(x)]) for x in serilizeRdd.collect()))
+
+        cStats = Statistics.colStats(mlibRDD)
+        # print(cStats.mean())
+
+        end = datetime.datetime.now()
+        print(end - start)
+        return cStats.mean()
+
+    def insertBatch(self):
+        """put(row, data, timestamp=None, wal=True)   table.put("row1",{"cf:1":"1"})"""
+        RowKeyFirst = "NO1"
+        sp = "XP"
+
+        for i in range(50000, 100000):
+            # print(i)
+            num = "%08d" % int(i)
+            # dateName = str(int(time.time()))
+            rowkey = RowKeyFirst + sp + num
+            # print(rowkey)
+            self.table.put(row=rowkey, data={"cf1:gdj": str(int(80)),
+                                             "cf1:fyj": str(int(90)),
+                                             "cf1:phj": str(int(95)),
+                                             "cf1:phl": str(int(100))})
+        # return 0

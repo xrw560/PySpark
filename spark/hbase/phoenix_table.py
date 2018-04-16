@@ -13,9 +13,9 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sparkContext=sc)
     df = sqlContext.read \
         .format("org.apache.phoenix.spark") \
-        .option("table", "\"test\"") \
-        .option("zkUrl", "ubuntu:2181") \
+        .option("table", "\"z_spark_1w\"") \
+        .option("zkUrl", "master:2181") \
         .load()
-    df.show()
+    print(df.count())
     sc.stop()
 

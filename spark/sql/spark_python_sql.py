@@ -89,7 +89,7 @@ if __name__ == '__main__':
             10
     """).map(lambda output: output.session_id + "\t" + str(output.cnt))
     for result in session_pv.collect():
-        print result
+        print(result)
 
     """
         DSL 数据分析
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             .limit(10)
     ).map(lambda output: output.session_id + "\t" + str(output['count']))
     for result in session_count.collect():
-        print result
+        print(result)
 
     # WEB UI 4040, 让线程休眠一段时间
     time.sleep(100000)

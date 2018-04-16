@@ -1,14 +1,9 @@
+#!/usr/bin/python
 # -*- encoding:utf-8 -*-
 """
 @author: zhouning
-@file:.py
-@time:2018/3/30 17:40
+@file:test_pymysql.py
+@time:2018/4/9 13:48
 """
-
-
-def cus_print(name):
-    print("hello ", name)
-
-
 if __name__ == '__main__':
     pass
