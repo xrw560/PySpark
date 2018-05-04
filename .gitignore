@@ -39,3 +39,6 @@ out
 gen
 target/
 /.project
+
+# python
+*.cpython-36.pyc
