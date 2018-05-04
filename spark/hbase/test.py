@@ -7,8 +7,9 @@
 """
 import sys
 
-sys.path.append('..')
-from core.word_count import cus_print as cp
+# sys.path.append('..')
+# from core.word_count import cus_print as cp
 
 if __name__ == '__main__':
-    cp('zhouning')
+    str = None
+    print(int(str))

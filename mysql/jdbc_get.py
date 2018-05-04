@@ -6,11 +6,14 @@
 @time:2018/4/9 14:38
 """
 import pymysql
+import MySQLdb as db
 
 if __name__ == '__main__':
-    conn = pymysql.connect(host="127.0.0.1", port=3306, user='root', password='root', db='python_test')
+    # conn = pymysql.connect(host="127.0.0.1", port=3306, user='root', password='root', db='python_test')
+    conn = db.connect(host='192.168.138.134', user="root", passwd="root", db="movie_db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM hosts")
+    cursor.execute("SELECT * FROM movie")
+
 
     # 获取第一行数据
     # row_1 = cursor.fetchone()

@@ -18,10 +18,11 @@ def create_spark_context(app_name='demo', log_level='WARN'):
     """
     spark_conf = SparkConf() \
         .setAppName(app_name) \
-        .set("spark.ui.showConsoleProgress", "false")
+        .set("spark.ui.showConsoleProgress", "false") \
+        .set("spark.default.parallelism", "24")
     sc = SparkContext(conf=spark_conf)
     sc.setLogLevel(log_level)
-    sc.addPyFile("dict_util.py")
+    sc.addPyFile("dict_util.py")  # Add a .py  dependency for all tasks to be executed
     sc.addPyFile("data_prepare.py")
     return sc
 

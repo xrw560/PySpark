@@ -49,7 +49,7 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sc)
 
     host = 'slave1,slave2,slave3'
-    table = 'z_spark_test'
+    table = 'z_spark_5000w_three'
     inputFormatClass = 'org.apache.hadoop.hbase.mapreduce.TableInputFormat'
     keyClass = 'org.apache.hadoop.hbase.io.ImmutableBytesWritable'
     valueClass = 'org.apache.hadoop.hbase.client.Result'
@@ -78,21 +78,21 @@ if __name__ == '__main__':
         lambda x, y: (x[0] + y[0], x[1] + y[1])
     ).map(lambda x: (x[0], float(x[1][0]) / float(x[1][1]))).collect()
 
-    # for x in result_mysql:
-    #     print(x)
+    for x in result_mysql:
+        print(x)
 
     # # ---------------------------- pyspark -------------------------------------
-    import pymysql
-
-    conn = pymysql.connect(host='192.168.0.179', port=3306, user='root', passwd='root', db='zn')
-    cursor = conn.cursor()
-    insert_sql = "INSERT INTO hbase_test04(qualifier,value) VALUES(%s,%s)"
-    cursor.executemany(insert_sql, result_mysql)
-    # 提交
-    conn.commit()
-    # 关闭游标和连接
-    cursor.close()
-    conn.close()
+    # import pymysql
+    #
+    # conn = pymysql.connect(host='192.168.0.179', port=3306, user='root', passwd='root', db='zn')
+    # cursor = conn.cursor()
+    # insert_sql = "INSERT INTO hbase_test04(qualifier,value) VALUES(%s,%s)"
+    # cursor.executemany(insert_sql, result_mysql)
+    # # 提交
+    # conn.commit()
+    # # 关闭游标和连接
+    # cursor.close()
+    # conn.close()
 
     sc.stop()
 
@@ -142,8 +142,6 @@ if __name__ == '__main__':
     # data_frame = sqlContext.read.json(n_map)
     # data_frame.show()
     # data_frame.printSchema()
-
-
 
     # print(type(json_loads))
     # json_str = json.loads(values)

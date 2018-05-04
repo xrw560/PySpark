@@ -15,10 +15,10 @@ def get_hbase_rdd(sc, table='posture_10w'):
     @param table: hbase表
     @return:
     """
-    last_update_time = posture_dao.get_last_update()
+    # last_update_time = posture_dao.get_last_update()
     row_start = ""
-    if last_update_time:
-        row_start = "SS" + last_update_time['update_time'].decode()
+    # if last_update_time:
+    #     row_start = "SS" + last_update_time['update_time'].decode()
     hbase_util = HBaseUtil()
     hbase_util.setTable(table)
     hbase_util.setRowStart(row_start)
@@ -38,6 +38,8 @@ class HBaseUtil:
     valueClass = 'org.apache.hadoop.hbase.client.Result'
     conf = {'hbase.zookeeper.quorum': host,
             'hbase.mapreduce.inputtable': table,
+            'hbase.mapreduce.scan.timerange.start': '1524046789053',
+            'hbase.mapreduce.scan.timerange.end': '2624046789035'
             # 'hbase.mapreduce.scan.column.family': 'info',
             # 'hbase.mapreduce.scan.columns': 'info:data01',
             # 'hbase.mapreduce.scan.row.start': 'ss0001',

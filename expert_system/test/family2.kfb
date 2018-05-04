@@ -1,0 +1,4 @@
+son_of(tim, thomas)
+son_of(fred, thomas)
+son_of(bruce, thomas)
+son_of(david, bruce)

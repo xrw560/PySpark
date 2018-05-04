@@ -14,7 +14,7 @@ def dict_concat(dict1, dict2):
     @param dict2:
     @return:
     """
-    dict1.update(dict2)
+    dict1.update(dict2)  # 返回None，拼接后的dict保存为dict1
     return dict1
 
 

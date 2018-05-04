@@ -16,7 +16,7 @@ def init_hbase_data(rdict):
     del rdict['columnFamily']
     del rdict['timestamp']
     del rdict['type']
-    rdict[rdict['qualifier']] = rdict['value']
+    rdict[rdict['qualifier']] = rdict['value']  # 数据格式：A1:0.01
     del rdict['qualifier']
     del rdict['value']
     return rdict

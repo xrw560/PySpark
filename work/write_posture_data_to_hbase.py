@@ -16,7 +16,7 @@ if __name__ == '__main__':
     sc.setLogLevel('WARN')
 
     host = 'slave1,slave2,slave3'
-    table = 'posture_500w'
+    table = 'posture_test01'
     keyClass = 'org.apache.hadoop.hbase.io.ImmutableBytesWritable'
     valueClass = 'org.apache.hadoop.hbase.client.Result'
     conf = {'hbase.zookeeper.quorum': host,
@@ -30,10 +30,13 @@ if __name__ == '__main__':
 
     now = datetime.datetime.now()
 
-    for cnt in range(1, 21):
+    for cnt in range(1, 5):
         raw_data = []
         for i in range(1, 250001):
-            row_key = (now + datetime.timedelta(milliseconds=(250000 * (cnt - 1) + i))).strftime('%Y%m%d%H%M%S%f')
+            # row_key = (now + datetime.timedelta(milliseconds=(250000 * (cnt - 1) + i))).strftime('%Y%m%d%H%M%S%f')
+            row_key = (now + datetime.timedelta(hours=8)
+                       + datetime.timedelta(minutes=30)
+                       + datetime.timedelta(milliseconds=(250000 * (cnt - 1) + i))).strftime('%Y%m%d%H%M%S%f')
             raw_data.append('SS{:0>20},info,A1,{:}'.format(row_key, '011000111100'))
             raw_data.append('SS{:0>20},info,A2,{:}'.format(row_key, 0.05 + (random.random() * 0.05)))
             raw_data.append('SS{:0>20},info,A3,{:}'.format(row_key, 0.05 + (random.random() * 0.05)))

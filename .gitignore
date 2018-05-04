@@ -42,3 +42,4 @@ target/
 
 # python
 *.cpython-36.pyc
+compiled_krb

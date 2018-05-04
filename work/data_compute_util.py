@@ -60,7 +60,7 @@ def get_total_score(roll_score, pitch_score, deviation_score):
     @param deviation_score: 偏航分数
     @return:
     """
-    return 0.3 * roll_score + 0.3 * pitch_score + 0.4 * deviation_score
+    return 1 / 3 * roll_score + 1 / 3 * pitch_score + 1 / 3 * deviation_score
 
 
 def get_mean_value(first_mean, first_count, second_mean, second_count):
