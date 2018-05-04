@@ -32,6 +32,17 @@ def dict_del(rdict):
     return rdict
 
 
+def dict_concat(dict1, dict2):
+    """
+    字典拼接
+    @param dict1:
+    @param dict2:
+    @return:
+    """
+    dict1.update(dict2)  # 返回None，拼接后的dict保存为dict1
+    return dict1
+
+
 if __name__ == '__main__':
     start = datetime.datetime.now()
     print('开始时间:', start)
@@ -49,7 +60,7 @@ if __name__ == '__main__':
     sqlContext = SQLContext(sc)
 
     host = 'slave1,slave2,slave3'
-    table = 'z_spark_5000w_three'
+    table = 'satellite_state_1000w'
     inputFormatClass = 'org.apache.hadoop.hbase.mapreduce.TableInputFormat'
     keyClass = 'org.apache.hadoop.hbase.io.ImmutableBytesWritable'
     valueClass = 'org.apache.hadoop.hbase.client.Result'
@@ -70,8 +81,12 @@ if __name__ == '__main__':
     # print(hbase_rdd.count())
 
     values = hbase_rdd.values()
-    base_rdd = values.flatMap(lambda x: x.split("\n")).map(lambda x: (x[16:22], float(x[134:138])))
-
+    base_rdd = values.flatMap(lambda x: x.split("\n")).map(lambda x: json.loads(x)).map(lambda x: (x.get('qualifier'), float(x.get('value'))))
+    # core_rdd = base_rdd.take(1)
+    # for x in core_rdd:
+    #     print(x)
+    # base_rdd = values.flatMap(lambda x: x.split("\n")).map(lambda x: (x[16:22], float(x[134:138])))
+    #
     result_mysql = base_rdd.combineByKey(
         lambda x: (x, 1),
         lambda x, y: (x[0] + y, x[1] + 1),
