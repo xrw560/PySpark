@@ -1,0 +1,4 @@
+son_of(michael, bruce)
+son_of(bruce, thomas)
+son_of(thomas, frederik)
+son_of(frederik, hiram)

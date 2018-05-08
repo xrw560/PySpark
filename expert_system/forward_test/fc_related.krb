@@ -1,0 +1,18 @@
+direct_father_son
+    foreach
+        family.son_of($son, $father)
+    assert
+        family.father_son($father, $son, ())
+grand_father_son
+    foreach
+        family.father_son($father, $grand_son, ())
+        family.father_son($grand_father, $father, ())
+    assert
+        family.father_son($grand_father, $grand_son, (grand))
+great_grand_father_son
+    foreach
+        family1.father_son($father, $gg_son, ())
+        family1.father_son($gg_father, $father, ($prefix1, *$rest_prefixes))
+    assert
+        family1.father_son($gg_father, $gg_son,(great, $prefix1, *$rest_prefixes))
+
