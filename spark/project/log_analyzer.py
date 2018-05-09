@@ -231,7 +231,7 @@ if __name__ == '__main__':
     # # +-------+------------------+
     #
     # # 可以使用自带的函数进行统计
-    # from pyspark.sql import functions as sql_function
+    from pyspark.sql import functions as sql_function
     # # 使用函数进行统计分析
     # content_size_state = logs_df.agg(
     #     sql_function.avg(logs_df['content_size']),
@@ -262,19 +262,19 @@ if __name__ == '__main__':
     """
         统计一下访问服务器次数超过10次host
     """
-    # # -1, 分组\统计
+    # # -1, 分组、统计
     # host_sum_df = logs_df.groupBy('host').count().sort('count', ascending=False) # 降序
-    # # -2, 过滤\筛选字段
+    # # -2, 过滤、筛选字段
     # host_more_than_10_df = host_sum_df\
     #     .filter(host_sum_df['count'] > 10)\
-    #     .select(host_sum_df['host'])
+    #     .select(host_sum_df['host']) # 只需要得到主机名
     # # -3, 打印
     # print 'Top 20 hosts that have accessed more than 10 times:\n'
     # host_more_than_10_df.show(truncate=False)
 
     # ####################### -4, URIs访问量统计 ################################
     """
-        统计服务区资源的访问量，首先按照path进行分组，然后计数
+        统计服务器资源的访问量，首先按照path进行分组，然后计数
     """
     # # -1, 分组、统计、排序
     # paths_df = (logs_df
@@ -285,14 +285,14 @@ if __name__ == '__main__':
     # # -2, 结果转换
     # paths_counts = (paths_df
     #                 .select('path', 'count')
-    #                 .map(lambda r: (r[0], r[1]))
+    #                 .map(lambda r: (r[0], r[1])) # 转成数组
     #                 .collect()
     #                 )
     # # -3, 显示前20 URI
-    # print paths_df.count()
+    # print(paths_df.count())
     # paths_df.show(truncate=False)
     # for uri_count in paths_counts:
-    #     print uri_count
+    #     print(uri_count)
 
     # ####################### -5, 统计HTTP返回状态不是200的十大URI ################################
     """
@@ -307,7 +307,7 @@ if __name__ == '__main__':
     #                .sort('count', ascending=False)
     #                )
     # # -3, 显示前10条数据
-    # print 'Top ten Failed URIs：'
+    # print('Top ten Failed URIs：')
     # logs_sum_df.show(10, False)
 
     # ####################### -6, 统计host的数量 ################################
@@ -315,11 +315,11 @@ if __name__ == '__main__':
         潜在条件：对host进行去重
     """
     # # 方式一：使用distinct进行去重
-    # print logs_df.select('host').distinct().count()
+    # print(logs_df.select('host').distinct().count())
     #
     # # 方式二：使用dropDuplicates进行去重
     # unique_host_count = logs_df.dropDuplicates(['host']).count()
-    # print 'Unique hosts: {0}'.format(unique_host_count)
+    # print('Unique hosts: {0}'.format(unique_host_count))
 
     # ####################### -7, 统计每天host访问量 ################################
     """
@@ -329,7 +329,7 @@ if __name__ == '__main__':
             -2, 将同一天的host相同进行去重
             -3, 最后按照day进行分组统计
     """
-    # # 导入模块函数
+    # # 导入模块函数，从日期中获取天
     # from pyspark.sql.functions import dayofmonth
     # # timestamp 提取day
     # day_to_host_pair_df = logs_df.select(logs_df.host, dayofmonth(logs_df.time).alias('day'))
@@ -338,8 +338,8 @@ if __name__ == '__main__':
     # # 分组统计
     # daily_host_df = day_group_host_df.groupBy('day').count().cache()
     # #
-    # print 'Unique hosts per day: '
-    # daily_host_df.show(30, False)
+    # print('Unique hosts per day: ')
+    # daily_host_df.show(30, False) # 显示前30个
 
     # ####################### -8, 日均host访问量 ################################
     """
@@ -369,7 +369,7 @@ if __name__ == '__main__':
     # # -5, SQL分析
     # avg_daily_req_host_df = sqlContext.sql(sql)
     # # -6, 打印结果
-    # print 'Avg number of daily requests per Host is: \n'
+    # print('Avg number of daily requests per Host is: \n')
     # avg_daily_req_host_df.show()
 
     # #######################  -9, 404状态数据分析 ################################
@@ -379,8 +379,7 @@ if __name__ == '__main__':
     # -1, 日志中有多少HTTP的响应是404, 使用filter函数进行过滤即可
     not_found_df = logs_df.filter('status=404')
     not_found_df.cache()
-    print
-    'Found {0} 404 URLs '.format(not_found_df.count())
+    print('Found {0} 404 URLs '.format(not_found_df.count()))
 
     # -2, 看看哪些URIs 返回的HTTP 404，考虑去重
     not_found_paths_df = not_found_df.select('path')
@@ -391,7 +390,7 @@ if __name__ == '__main__':
     print('404 URIs: \n')
     unique_not_found_paths_df.show(n=40, truncate=False)
 
-    # -3, 统计返回HTTP 404状态中最多的前20个URIs，按照path进行分组，记性count统计，将序排序
+    # -3, 统计返回HTTP 404状态中最多的前20个URIs，按照path进行分组，进行count统计，将序排序
     # 分组统计排序
     top_20_not_found_df = (not_found_paths_df
                            .groupBy('path')
@@ -400,8 +399,7 @@ if __name__ == '__main__':
                            )
     not_found_paths_df.unpersist()
     # 打印
-    print
-    'Top Twenty 404 URIs: \n'
+    print('Top Twenty 404 URIs: \n')
     top_20_not_found_df.show(n=20, truncate=False)
 
     # -4, 统计收到HTTP 404状态的最多的25 hosts
@@ -413,8 +411,7 @@ if __name__ == '__main__':
                           .sort('count', ascending=False)
                           )
     # 显示
-    print
-    'Top 25 hosts that generated errors: \n'
+    print('Top 25 hosts that generated errors: \n')
     hosts_404_count_df.show(n=25, truncate=False)
 
     # -5, 统计每天出现的HTTP 404 的次数
@@ -426,14 +423,12 @@ if __name__ == '__main__':
                          .count()
                          )
     #
-    print
-    '404 Error by day: \n'
+    print('404 Error by day: \n')
     errors_by_date_df.show(n=30, truncate=False)
 
     # -6, 统计哪5天出现HTTP 404次数最多
     top_error_date_df = errors_by_date_df.sort('count', ascending=False)
-    print
-    'Top Five Dates For 404 Requests: \n'
+    print('Top Five Dates For 404 Requests: \n')    
     top_error_date_df.show(n=5, truncate=False)
 
     # -7, 既然能够按照每天HTTP 404出现次数计算统计，也可以按照小时进行统计分析
@@ -446,8 +441,7 @@ if __name__ == '__main__':
                               .sort('count', ascending=False)
                               )
     #
-    print
-    'Top hours for 404 Requests:\n'
+    print('Top hours for 404 Requests:\n')    
     hour_records_sorted_df.show(n=24, truncate=False)
 
     not_found_df.unpersist()
