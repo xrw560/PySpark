@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys  
+import sys
 import os
 import time
 from numpy import *
@@ -9,8 +9,8 @@ from numpy import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-vector1 = mat([1,2,3])
-vector2 = mat([4,7,5])
+vector1 = mat([1, 2, 3])
+vector2 = mat([4, 7, 5])
 '''
 print sqrt((vector1-vector2)*((vector1-vector2).T))
 

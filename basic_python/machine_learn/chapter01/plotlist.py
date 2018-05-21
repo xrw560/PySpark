@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
-import sys  
+"""
+1.4.2 表与线性结果的可视化
+"""
+import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,14 +12,12 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 # 曲线数据加入噪声
-
-x = np.linspace(-5,5,200);
-y = np.sin(x);# 给出y与x的基本关系
-yn = y+np.random.rand(1,len(y))*1.5 ;	# 加入噪声的点集
+x = np.linspace(-5, 5, 200)
+y = np.sin(x)  # 给出y与x的基本关系
+yn = y + np.random.rand(1, len(y)) * 1.5  # 加入噪声的点集
 # 绘图
 fig = plt.figure()
-ax = fig.add_subplot(111) 
-ax.scatter(x,yn,c='blue',marker='o')
-ax.plot(x,y+0.75,'r') 
+ax = fig.add_subplot(111)
+ax.scatter(x, yn, c='blue', marker='o')
+ax.plot(x, y + 0.75, 'r')
 plt.show()
-
