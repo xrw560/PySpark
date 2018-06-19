@@ -16,7 +16,7 @@ if __name__ == '__main__':
     sc.setLogLevel('WARN')
 
     host = 'slave1,slave2,slave3'
-    table = 'posture'
+    table = 'sat_new'
     keyClass = 'org.apache.hadoop.hbase.io.ImmutableBytesWritable'
     valueClass = 'org.apache.hadoop.hbase.client.Result'
     conf = {'hbase.zookeeper.quorum': host,
@@ -28,11 +28,11 @@ if __name__ == '__main__':
     keyConv = 'org.apache.spark.examples.pythonconverters.StringToImmutableBytesWritableConverter'
     valueConv = 'org.apache.spark.examples.pythonconverters.StringListToPutConverter'
 
-    for cnt in range(160, 201):
+    for cnt in range(1, 2):
         raw_data = []
         for i in range(1, 250001):
             for j in range(1, 5):
-                raw_data.append('SS%.4d%.8d,info,data0%d,%.2f' % (cnt, i, j, j - 0.25 + (random.random() * 0.5)))
+                raw_data.append('01PT%.4d%.8d,info,data0%d,%.2f' % (cnt, i, j, j - 0.25 + (random.random() * 0.5)))
 
         sc.parallelize(raw_data) \
             .map(lambda x: (table, x.split(','))) \
