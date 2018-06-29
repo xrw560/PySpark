@@ -10,6 +10,7 @@ import random
 import numpy as np
 
 if __name__ == '__main__':
-    x = np.linspace(1, 10, 10)
-    y = x * 2 + 1
-    print(y)
+    x = np.array([1, 2, 4, 7, 0])
+    print(np.diff(x))
+    y = [1, 3, 4, 7]
+    print(np.diff(y))
