@@ -17,7 +17,7 @@ predictions = lr.predict(features)
 from sklearn.linear_model import LogisticRegression
 from sklearn.cross_validation import cross_val_predict, KFold
 
-lr = LogisticRegression()
+lr = LogisticRegression(class_weight="balanced")  # 调整正负样本权重
 kf = KFold(features.shape[0], random_state=1)
 predictions = cross_val_predict(lr, features, target, cv=kf)
 predictions = pd.Series(predictions)

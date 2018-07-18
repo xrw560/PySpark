@@ -14,17 +14,13 @@ target = loans["loan_status"]
 lr.fit(features, target)
 predictions = lr.predict(features)
 
-from sklearn.linear_model import LogisticRegression
 from sklearn.cross_validation import cross_val_predict, KFold
+from sklearn.ensemble import RandomForestClassifier
 
-penalty = {
-    0: 5,
-    1: 1
-}
-
-lr = LogisticRegression(class_weight=penalty)  # 自定义权重项
+rf = RandomForestClassifier(n_estimators=10, class_weight="balanced", random_state=1)
+# print help(RandomForestClassifier)
 kf = KFold(features.shape[0], random_state=1)
-predictions = cross_val_predict(lr, features, target, cv=kf)
+predictions = cross_val_predict(rf, features, target, cv=kf)
 predictions = pd.Series(predictions)
 
 # False positives.

@@ -17,7 +17,12 @@ predictions = lr.predict(features)
 from sklearn.linear_model import LogisticRegression
 from sklearn.cross_validation import cross_val_predict, KFold
 
-lr = LogisticRegression(class_weight="balanced")  # 调整正负样本权重
+penalty = {
+    0: 5,
+    1: 1
+}
+
+lr = LogisticRegression(class_weight=penalty)  # 自定义权重项
 kf = KFold(features.shape[0], random_state=1)
 predictions = cross_val_predict(lr, features, target, cv=kf)
 predictions = pd.Series(predictions)
@@ -44,4 +49,3 @@ fpr = fp / float((fp + tn))
 
 print(tpr)
 print(fpr)
-print(predictions[:20])
