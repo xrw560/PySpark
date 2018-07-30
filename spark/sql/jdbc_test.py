@@ -15,7 +15,7 @@ spark = SparkSession \
     .appName("jdbc_test") \
     .getOrCreate()
 url = "jdbc:mysql://192.168.2.179:3306/bigdata_test"
-table = "(select evaluate_time_length from script_metadata) t"
+table = "(select evaluate_time_length from script_metadata) t"  # 注意括号和表别名，必须得有，这里可以过滤数据
 properties = {
     "user": "root",
     "password": "root",
