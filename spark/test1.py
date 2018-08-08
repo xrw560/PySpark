@@ -18,17 +18,21 @@ spark = SparkSession.builder \
     .appName("test") \
     .getOrCreate()
 sc = spark.sparkContext
+sc.addPyFile
+rdd = sc.parallelize([(1, 2, 3), (1, 2, 3), (1, 2, 4), (4, 5, 6)]).distinct()
+for x in rdd.countByKey().items():
+    print(x)
 
 # rdd = sc.parallelize([1, 2, 3]).flatMap(lambda x: rdd_to_tuple(x))
 # for x in rdd.collect():
-#     print(x[0])
-rdict = {1: "value1", 2: "value2", 3: "value3"}
-# bc_dict = sc.broadcast(rdict)
-# re = rdd.map(lambda x: bc_dict.value[x[0]]).collect()
-# for x in re:
-#     print(x)
-ddict = {(1, 1), (1, 2), (2, 3), (2, 1)}
-zip_value = zip(rdict, ddict)
-# for x in list(zip_value):
-#     print(x)
-print(sc.parallelize(ddict).groupByKey(lambda x: x).collect())
+# #     print(x[0])
+# rdict = {1: "value1", 2: "value2", 3: "value3"}
+# # bc_dict = sc.broadcast(rdict)
+# # re = rdd.map(lambda x: bc_dict.value[x[0]]).collect()
+# # for x in re:
+# #     print(x)
+# ddict = {(1, 1), (1, 2), (2, 3), (2, 1)}
+# zip_value = zip(rdict, ddict)
+# # for x in list(zip_value):
+# #     print(x)
+# print(sc.parallelize(ddict).groupByKey(lambda x: x).collect())
