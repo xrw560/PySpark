@@ -30,9 +30,33 @@ if __name__ == '__main__':
 
     #
 
-    lis = "01234567890123456789"
-    print(list(lis))
-    lis = lis[:15]
-    print(lis)
-    print(lis.count('1'))
+    # lis = "01234567890123456789"
+    # print(list(lis))
+    # lis = lis[:15]
+    # print(lis)
+    # print(lis.count('1'))
 
+    import random
+
+    # print(random.random() * 16 + 30)
+    # print(int(random.random()*2))
+    # print(int(1.6))
+    import math
+    # print(round(random.random()+0.3))
+    import numpy as np
+
+    # print(np.mean(1,2,3,4,5,6,7))
+
+    lis = [1, 3, 5]
+    # print(3 in lis)
+    import pandas as pd
+
+
+    def t():
+        return None, None
+
+
+    a, b = t()
+    # print(a, b)
+    import datetime
+    print(datetime.datetime.now()+datetime.timedelta(seconds=2064490507491))
