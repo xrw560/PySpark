@@ -35,22 +35,26 @@ pool.shutdown(wait=True)
 """
 
 ########### 编写方式二 ###########
+"""降低耦合"""
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import time
 
+
 def task(url):
     """
     下载页面
-    :param url:
+    : param url:
     :return:
     """
     response = requests.get(url)
     return response
 
-def done(future,*args,**kwargs):
+
+def done(future, *args, **kwargs):
     response = future.result()
-    print(response.status_code,response.content)
+    print(response.status_code, response.content)
+
 
 pool = ThreadPoolExecutor(7)
 url_list = [
@@ -63,11 +67,7 @@ url_list = [
     'http://www.autohome.com.cn',
 ]
 for url in url_list:
-    v = pool.submit(task,url)
+    v = pool.submit(task, url)
     v.add_done_callback(done)
 
 pool.shutdown(wait=True)
-
-
-
-

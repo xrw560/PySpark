@@ -39,13 +39,16 @@ from concurrent.futures import ProcessPoolExecutor
 import requests
 import time
 
+
 def task(url):
     response = requests.get(url)
     return response
 
-def done(future,*args,**kwargs):
+
+def done(future, *args, **kwargs):
     response = future.result()
-    print(response.status_code,response.content)
+    print(response.status_code, response.content)
+
 
 pool = ProcessPoolExecutor(7)
 url_list = [
@@ -58,11 +61,7 @@ url_list = [
     'http://www.autohome.com.cn',
 ]
 for url in url_list:
-    v = pool.submit(task,url)
+    v = pool.submit(task, url)
     v.add_done_callback(done)
 
 pool.shutdown(wait=True)
-
-
-
-

@@ -17,6 +17,7 @@ def task(method, url, req_kwargs):
 #     gevent.spawn(task, method='get', url='https://www.yahoo.com/', req_kwargs={}),
 #     gevent.spawn(task, method='get', url='https://github.com/', req_kwargs={}),
 # ])
+
 # ##### 发送请求（协程池控制最大协程数量） #####
 from gevent.pool import Pool
 pool = Pool(5)

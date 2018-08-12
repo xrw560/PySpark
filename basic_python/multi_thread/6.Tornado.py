@@ -5,6 +5,8 @@ from tornado.httpclient import HTTPRequest
 from tornado import ioloop
 
 COUNT = 0
+
+
 def handle_response(response):
     global COUNT
     COUNT -= 1
@@ -16,6 +18,7 @@ def handle_response(response):
         # ioloop.IOLoop.current().stop()
     if COUNT == 0:
         ioloop.IOLoop.current().stop()
+
 
 def func():
     url_list = [
@@ -31,4 +34,4 @@ def func():
 
 
 ioloop.IOLoop.current().add_callback(func)
-ioloop.IOLoop.current().start() # 死循环
+ioloop.IOLoop.current().start()  # 死循环

@@ -1,5 +1,6 @@
 import asyncio
 
+"""https://www.cnblogs.com/wupeiqi/articles/6229292.html"""
 """
 @asyncio.coroutine
 def task():
@@ -14,7 +15,6 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(asyncio.gather(*tasks))
 loop.close()
 """
-
 
 """
 import asyncio
@@ -70,9 +70,9 @@ import requests
 
 @asyncio.coroutine
 def task(func, *args):
-    print(func,args)
+    print(func, args)
     loop = asyncio.get_event_loop()
-    future = loop.run_in_executor(None, func, *args) # requests.get('http://www.cnblogs.com/wupeiqi/')
+    future = loop.run_in_executor(None, func, *args)  # requests.get('http://www.cnblogs.com/wupeiqi/')
     response = yield from future
     print(response.url, response.content)
 
