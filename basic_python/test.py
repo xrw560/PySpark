@@ -51,12 +51,18 @@ if __name__ == '__main__':
     # print(3 in lis)
     import pandas as pd
 
-
-    def t():
-        return None, None
-
-
-    a, b = t()
-    # print(a, b)
-    import datetime
-    print(datetime.datetime.now()+datetime.timedelta(seconds=2064490507491))
+    rdict = {1: 1, 2: 3, 3: 3, 4: 1, 5: 1, 6: 1}
+    rsdict = {'key': list(rdict.keys()), 'part': list(rdict.values())}
+    df = pd.DataFrame.from_dict(rsdict)
+    df2 = df.groupby(df['part'])
+    for k, v in df2:
+        print(k)
+        print(len(set(v['key'])))
+        print("--------")
+    # for x in list(df2['part']):
+    #     print(x)
+    #     print("----------")
+    # rd_dict = dict(list(df2))
+    # for k, v in rd_dict.items():
+    #     print(k, v)
+    #     print(type(k), type(v))

@@ -22,7 +22,7 @@ ML包下的KMeans方法位于org.apache.spark.ml.clustering包下，其过程大
 from pyspark.sql import Row, SparkSession
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.linalg import Vectors
-
+from sklearn.grid_search import GridSearchCV
 
 def f(x):
     rel = {}
