@@ -8,20 +8,26 @@
 """
 
 from pyspark.sql import SparkSession, Row
+import os
+
+os.environ['JAVA_HOME'] = 'D:\java\jdk'
 
 
 def rdd_to_tuple(x):
     return [(x, 1), (x, 2), (x, 3)]
 
 
-spark = SparkSession.builder \
-    .appName("test") \
-    .getOrCreate()
+spark = SparkSession.builder.master("local[*]").appName("test").getOrCreate()
 sc = spark.sparkContext
-sc.addPyFile
-rdd = sc.parallelize([(1, 2, 3), (1, 2, 3), (1, 2, 4), (4, 5, 6)]).distinct()
-for x in rdd.countByKey().items():
-    print(x)
+rdd = sc.parallelize([(1, 2, 3), (1, 2, 3), (1, 2, 4), (4, 5, 6)])
+
+res_rdd = rdd.aggregateByKey(
+    (0, 0),
+    lambda x, y: (x[0] + y[0], x[1] + y[1]),
+    lambda x, y: (x[0] + y[0], x[1] + y[1])
+)
+for x in res_rdd.collect():
+    print x
 
 # rdd = sc.parallelize([1, 2, 3]).flatMap(lambda x: rdd_to_tuple(x))
 # for x in rdd.collect():
